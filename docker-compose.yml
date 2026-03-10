@@ -131,7 +131,7 @@ services:
     container_name: redis__open-wearables
     image: redis:8
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/var/lib/redis/data
 
