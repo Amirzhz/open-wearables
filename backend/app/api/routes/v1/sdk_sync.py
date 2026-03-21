@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from logging import getLogger
 
@@ -89,12 +90,13 @@ async def sync_sdk_data(
     content_str = body.model_dump_json()
 
     background_tasks.add_task(
+        asyncio.to_thread,
         process_sdk_upload,
-        content=content_str,
-        content_type="application/json",
-        user_id=user_id,
-        provider=provider,
-        batch_id=batch_id,
+        content_str,
+        "application/json",
+        user_id,
+        provider,
+        batch_id,
     )
 
     return UploadDataResponse(status_code=202, response="Import task queued successfully", user_id=user_id)
