@@ -1,7 +1,7 @@
 import uuid
 from logging import getLogger
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, status
 
 from app.integrations.celery.tasks.process_sdk_upload_task import process_sdk_upload
 from app.schemas import SDKSyncRequest, UploadDataResponse
@@ -17,6 +17,7 @@ async def sync_sdk_data(
     user_id: str,
     body: SDKSyncRequest,
     auth: SDKAuthDep,
+    background_tasks: BackgroundTasks,
 ) -> UploadDataResponse:
     """Import health data from SDK provider asynchronously via Celery.
 
@@ -87,7 +88,8 @@ async def sync_sdk_data(
 
     content_str = body.model_dump_json()
 
-    process_sdk_upload.delay(
+    background_tasks.add_task(
+        process_sdk_upload,
         content=content_str,
         content_type="application/json",
         user_id=user_id,

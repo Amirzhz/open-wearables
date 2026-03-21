@@ -128,6 +128,15 @@ def process_sdk_upload(
             sleep_saved=result.get("sleep_saved", 0),
         )
 
-        finalize_stale_sleeps.delay()
+        try:
+            finalize_stale_sleeps.delay()
+        except Exception as e:
+            log_structured(
+                logger,
+                "warning",
+                f"Could not queue finalize_stale_sleeps: {e}",
+                action="finalize_stale_sleeps_queue_error",
+                batch_id=batch_id,
+            )
 
         return {**result, "batch_id": batch_id}
